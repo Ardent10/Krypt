@@ -10,12 +10,12 @@
 // }
 
 module.exports = {
-  // purge: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
   content: [
-    "./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"
+    "./index.html",
+    "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
-  mode: "jit",
-  darkMode: "media", // or 'media' or 'class'
+  // mode: "jit",
+  // darkMode: "media", // or 'media' or 'class'
   theme: {
     fontFamily: {
       display: ["Open Sans", "sans-serif"],
@@ -42,8 +42,13 @@ module.exports = {
       },
     },
   },
-  variants: {
-    extend: {},
-  },
-  plugins: [require("@tailwindcss/forms")],
+  // corePlugins: {
+  //   preflight: false,
+  // },
+  // variants: {
+  //   extend: {},
+  // },
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
 };
