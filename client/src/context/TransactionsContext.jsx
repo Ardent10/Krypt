@@ -24,8 +24,9 @@ export const TransactionProvider = ({children})=>{
 
     const [currentAccount, setCurrentAccount] = useState('');
     const [formData, setFormData]             = useState({addressTo: "",amount:"", keyword: "", message: "" });
-    const [isLoding, setLoading]              = useState(false);  
+    const [isLoading, setLoading]              = useState(false);  
     const [transactionCount, setTrasactionCount] = useState(localStorage.getItem('transactionCount'));
+    const [transactions, setTransactions] = useState([]);
 
     // form to send transaction
     const handleChange = (e,name)=>{
@@ -34,6 +35,31 @@ export const TransactionProvider = ({children})=>{
             [name]:e.target.value,
         }))
     }
+
+    const getAllTransactions = async () =>{
+        try {
+            if(!ethereum) return alert("Please Install MetaMask");
+            const transactionContract = getEthereumContract();
+            const availableTransactions = await transactionContract.getAllTransactions();
+            
+            const structuredTransactions  = availableTransactions.map((transaction)=>({
+                addressTo:transaction.reciever,
+                addressFrom: transaction.sender,
+                timestamp: new Date(transaction.timestamp.toNumber()*1000).toLocaleString(),
+                message:transaction.message,
+                keyword:transaction.keyword,
+                amount:parseInt(transaction.amount._hex)/(10**18)
+            })) 
+
+            setTransactions(structuredTransactions);
+            console.log(availableTransactions);
+            console.log(structuredTransactions);
+        } 
+        catch (err) {
+            console.log(err);
+        }
+    }  
+
 
     //Checking the wallet If MetaMask exists or not
     const CheckWallet = async ()=>{
@@ -47,7 +73,7 @@ export const TransactionProvider = ({children})=>{
            if(accounts.length){
                setCurrentAccount(accounts[0]);
     
-               //getAllTransactions();
+               getAllTransactions();
            }
            else
            {
@@ -60,6 +86,19 @@ export const TransactionProvider = ({children})=>{
        }
        
     }
+
+    const checkIfTransactionExist = async ()=>{
+        try {
+            const transactionContract = getEthereumContract();
+            const transactionCount = await transactionContract.getTransactionsCount();
+            window.localStorage.setItem("transactionCount",transactionCount);
+        } 
+        catch (err) {
+            console.log(err);    
+            throw new Error("No ethereum Object.");
+        }
+    }
+
 
     //Connecting to MetaMask wallet
     const connectWallet = async()=>{
@@ -109,7 +148,8 @@ export const TransactionProvider = ({children})=>{
 
             const transactionCount = await transactionContract.getTransactionsCount();
             setTrasactionCount(transactionCount.toNumber());
-        
+            
+            window.reload();
         } 
         catch (err) {
             console.log(err);
@@ -121,13 +161,14 @@ export const TransactionProvider = ({children})=>{
     //Calling to checkWallet function
     useEffect(()=>{
         CheckWallet();
+        checkIfTransactionExist();
 
     },[])
 
 
     //returning the context
     return (
-        <TransactionContext.Provider value= {{connectWallet,currentAccount,formData,setFormData,handleChange,sendTransaction}}>
+        <TransactionContext.Provider value= {{connectWallet,currentAccount,formData,setFormData,handleChange,sendTransaction,transactions,isLoading}}>
          {children}
         </TransactionContext.Provider>
     );
