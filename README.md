@@ -1,5 +1,5 @@
 # Krypt
-### WEB 3.0 Block chain app. Which allows to send &amp; receive ETH with awesome Gifs messages. 
+### WEB 3.0 Block chain application. Which allows to send &amp; receive ETH with awesome Gifs messages. 
 <br/>
 It uses Solidity contracts that enables user to send and recieve ETH to their MetaMask Wallet.
 
