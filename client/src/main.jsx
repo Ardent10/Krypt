@@ -6,9 +6,7 @@ import {TransactionProvider} from "./context/TransactionsContext";
 
 ReactDOM.render(
   <TransactionProvider>
-    <React.StrictMode>
       <App />
-    </React.StrictMode>
   </TransactionProvider>,
   document.getElementById('root')
 )
